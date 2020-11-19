@@ -17,7 +17,7 @@ class App extends React.Component{
     super();
     this.state ={
       city:undefined,
-      country : undefined,
+      
       curTemp : undefined,
       low : undefined,
       max:undefined,
@@ -74,27 +74,33 @@ class App extends React.Component{
     e.preventDefault();
 
     const city = e.target.elements.city.value;
-    const country = e.target.elements.country.value;
-    console.log(city);
+   
     let url;
-    if(city && country){
-       url= `http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid='${apiKey}`;
-       console.log(url);
+    if(city){
+      url= `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+      
       let req = await fetch(url);
     
-    
-    let res = await req.json();
-    console.log(res);
+      let res = await req.json();
+      //console.log(res.sys.country);
+      try {
+        this.setState({
+          city : `${res.name},${res.sys.country}`,
+          curTemp : this.getCelcious(res.main.temp),
+          low : this.getCelcious(res.main.temp_min),
+          max : this.getCelcious(res.main.temp_max),
+          feelsLike : this.getCelcious(res.main.feels_like),
+          description : res['weather'][0]['description'],
+          error:false,
+        });
+        this.getIcon(this.iconList, res.weather[0].id);
+      } catch (Exception) {
+        this.setState({error:true});
+       
+      }
+
    
-    this.setState({
-      city : `${res.name},${res.country}`,
-      curTemp : this.getCelcious(res.main.temp),
-      low : this.getCelcious(res.main.temp_min),
-      max : this.getCelcious(res.main.temp_max),
-      feelsLike : this.getCelcious(res.main.feels_like),
-      description : res['weather'][0]['description']
-    });
-    this.getIcon(this.iconList, res.weather[0].id)
+    
   }else{
     this.setState({error:true});
   }
@@ -102,11 +108,12 @@ class App extends React.Component{
 
   render(){
     return (
+      
+        
       <div className="App">
         <Form loadWeather={this.getWeather}
         error={this.state.error}/>
         <Weather city={this.state.city}
-         country={this.state.country}
          curTemp ={this.state.curTemp}
          feelsLike = {this.state.feelsLike}
          min = {this.state.low}
