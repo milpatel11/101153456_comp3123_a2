@@ -11,7 +11,7 @@ const Form = props=>{
                      className="form-control" 
                      name="city" 
                      autoComplete="off"
-                     placeholder="City" />
+                     placeholder="e.g. Toronto,Ca" />
                 </div>
                 <div className="col-md-3">
                 
